@@ -15,7 +15,7 @@ const debounce = (func: Function, delay: number) => {
 };
 
 const SearchForm = () => {
-  const [search, setSearch] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [date, setDate] = useState("");
   const [results, setResults] = useState({ destinations: [], products: [] });
   const [abortController, setAbortController] =
@@ -26,7 +26,7 @@ const SearchForm = () => {
 
   const fetchAutocompleteResults = async (searchTerm: string) => {
     if (abortController) {
-      abortController.abort(); // Cancel previous request
+      abortController.abort(); 
     }
 
     const controller = new AbortController();
@@ -34,7 +34,7 @@ const SearchForm = () => {
 
     const config = {
       headers: {
-        Authorization: `Bearer ${temp.accessToken}`,
+        Authorization: `Bearer ${temp?.accessToken}`,
       },
       signal: controller.signal,
     };
@@ -44,9 +44,10 @@ const SearchForm = () => {
         `https://dev.intraversewebservices.com/api/product/v1/package/auto-complete?q=${searchTerm}`,
         config
       );
+      console.log('myresponse', response)
       setResults({
-        destinations: response.data.destinations,
-        products: response.data.products,
+        destinations: response.data.data.destinations,
+        products: response.data.data.products,
       });
     } catch (error) {
       if (axios.isCancel(error)) {
@@ -58,26 +59,28 @@ const SearchForm = () => {
   };
 
   const debouncedFetch = useCallback(debounce(fetchAutocompleteResults, 300), [
-    temp.accessToken,
+    temp?.accessToken,
   ]);
 
   useEffect(() => {
-    if (search.trim() === "") {
-      setResults({ destinations: [], products: [] }); // Clear results if search is empty
+    if (searchTerm.trim() === "") {
+      setResults({ destinations: [], products: [] }); 
       return;
     }
-    debouncedFetch(search);
-  }, [search, debouncedFetch]);
+    debouncedFetch(searchTerm);
+  }, [searchTerm, debouncedFetch]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({ search, date });
+    console.log({ searchTerm, date });
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
+    setSearchTerm(e.target.value);
   };
 
+  console.log('search', searchTerm)
+console.log("description", results);
   return (
     <div className="flex justify-center items-center h-screen">
       <form
@@ -96,33 +99,36 @@ const SearchForm = () => {
           <input
             type="text"
             id="search"
-            value={search}
+            value={searchTerm}
             onChange={handleInputChange}
             placeholder="e.g. Lagos, Nigeria"
             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           />
 
-          {search && (
+          {searchTerm && (
             <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg">
-              {results.destinations.length > 0 && (
+              {results?.destinations?.length > 0 && (
                 <div className="p-2">
                   <h3 className="text-sm font-bold">Destinations</h3>
                   {results.destinations.map((destination: any) => (
                     <div
-                      key={destination.id}
+                      key={destination.destinationId}
                       className="p-2 hover:bg-gray-100 cursor-pointer"
                     >
                       <h4 className="text-sm font-medium">
-                        {destination.name}
+                        {destination.destinationName}
                       </h4>
                       <p className="text-xs text-gray-500">
-                        Tags: {destination.tags.join(", ")}
+                        Tags:{" "}
+                        {destination.tags
+                          .map((tag: any) => tag.tagName)
+                          .join(", ")}
                       </p>
                     </div>
                   ))}
                 </div>
               )}
-              {results.products.length > 0 && (
+              {results?.products?.length > 0 && (
                 <div className="p-2">
                   <h3 className="text-sm font-bold">Products</h3>
                   {results.products.map((product: any) => (

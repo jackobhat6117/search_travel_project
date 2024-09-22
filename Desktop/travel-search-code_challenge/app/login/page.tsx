@@ -2,9 +2,11 @@
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const LoginPage = () => {
-  const [email, setEmail] = useState(""); // Change to email
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
@@ -14,37 +16,38 @@ const LoginPage = () => {
 
     const result = await signIn("credentials", {
       redirect: false,
-      email, 
+      email,
       password,
     });
 
-    if (result?.error) {
-      setError(result.error);
-    } else {
-      router.push("/search");
-    }
+   if (result?.error) {
+     setError(result.error);
+     toast.error(result.error, { autoClose: 3000 });
+   } else {
+     toast.success("Login successful!", { autoClose: 3000 });  
+     router.push("/search");
+     
+   }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
         <h2 className="text-3xl font-semibold text-center mb-6">Login</h2>
-
         {error && <div className="mb-4 text-red-500 text-sm">{error}</div>}
-
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
-              htmlFor="email" // Change to email
+              htmlFor="email"
               className="block text-sm font-medium text-gray-700"
             >
               Email
             </label>
             <input
-              type="text"
-              id="email" // Change to email
-              value={email} // Change to email
-              onChange={(e) => setEmail(e.target.value)} // Change to setEmail
+              type="email" // Change type to email for better validation
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               required
             />
@@ -72,6 +75,7 @@ const LoginPage = () => {
             Sign In
           </button>
         </form>
+        <ToastContainer /> 
       </div>
     </div>
   );
