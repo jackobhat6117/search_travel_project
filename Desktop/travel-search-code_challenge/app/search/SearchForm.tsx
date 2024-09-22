@@ -93,7 +93,6 @@ const SearchForm = () => {
   console.log('search', searchTerm)
 console.log("description", results);
   return (
- 
     <div className="flex flex-col h-screen">
       <Navbar />
       <div className="flex justify-center items-center flex-grow">
@@ -121,7 +120,40 @@ console.log("description", results);
 
             {searchTerm && (
               <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg">
-                {/* Your existing autocomplete rendering logic */}
+                {results?.destinations?.length > 0 && (
+                  <div className="p-2">
+                    <h3 className="text-sm font-bold">Destinations</h3>
+                    {results.destinations.map((destination: any) => (
+                      <div
+                        key={destination.destinationId}
+                        className="p-2 hover:bg-gray-100 cursor-pointer"
+                      >
+                        <h4 className="text-sm font-medium">
+                          {destination.destinationName}
+                        </h4>
+                        <p className="text-xs text-gray-500">
+                          Tags:{" "}
+                          {destination.tags
+                            .map((tag: any) => tag.tagName)
+                            .join(", ")}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {results?.products?.length > 0 && (
+                  <div className="p-2">
+                    <h3 className="text-sm font-bold">Products</h3>
+                    {results.products.map((product: any) => (
+                      <div
+                        key={product.id}
+                        className="p-2 hover:bg-gray-100 cursor-pointer"
+                      >
+                        <h4 className="text-sm font-medium">{product.name}</h4>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
